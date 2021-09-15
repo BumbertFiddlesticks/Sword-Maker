@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://Sword.shader" type="Shader" id=1]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/frame = 0
+shader_param/index1 = 3
+shader_param/index2 = 0
+shader_param/index3 = 2
+shader_param/dimHandle = Vector2( 100, 40 )
+shader_param/dimGem = Vector2( 12, 60 )
+shader_param/seed = 0.0
+shader_param/seed2 = 0.0

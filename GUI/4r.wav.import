@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/4r.wav-4c53ecb2cebcf223ab618e458495bbb0.sample"
+
+[deps]
+
+source_file="res://GUI/4r.wav"
+dest_files=[ "res://.import/4r.wav-4c53ecb2cebcf223ab618e458495bbb0.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

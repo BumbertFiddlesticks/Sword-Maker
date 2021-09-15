@@ -1,0 +1,515 @@
+[gd_scene load_steps=25 format=2]
+
+[ext_resource path="res://GUI/export2.wav" type="AudioStream" id=1]
+[ext_resource path="res://GUI/arrow-hover.png" type="Texture" id=2]
+[ext_resource path="res://GUI/arrow-click.png" type="Texture" id=3]
+[ext_resource path="res://GUI/arrow.png" type="Texture" id=4]
+[ext_resource path="res://GUI/4l.wav" type="AudioStream" id=5]
+[ext_resource path="res://GUI/4r.wav" type="AudioStream" id=6]
+[ext_resource path="res://swordbackground.png" type="Texture" id=7]
+[ext_resource path="res://Sword.tres" type="Material" id=8]
+[ext_resource path="res://GUI.gd" type="Script" id=11]
+[ext_resource path="res://GUI/Theme.tres" type="Theme" id=12]
+[ext_resource path="res://Renderer.gd" type="Script" id=14]
+[ext_resource path="res://Renderer2.gd" type="Script" id=15]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+const float aspect_ratio = 1024. / 600.;
+
+void fragment() {
+	vec2 uv_mod = UV;
+    uv_mod.x = mix(0.5, uv_mod.x, aspect_ratio);
+    uv_mod = mod(1.5 * uv_mod + 0.05 * TIME * vec2(1., -1.), 1.);
+	
+	if ((uv_mod.x > 0.5 && uv_mod.y > 0.5) || (uv_mod.x < 0.5 && uv_mod.y < 0.5)) {
+		COLOR = vec4(102., 57., 49., 255.) / 255.;
+		//COLOR = vec4(48., 96., 130., 255.) / 255.;
+	} else {
+		COLOR = vec4(143., 86., 59., 255.) / 255.;
+		//COLOR = vec4(91., 110., 225., 255.) / 255.;
+	}
+
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+
+[sub_resource type="Shader" id=3]
+code = "shader_type canvas_item;
+
+uniform float brightness = 1.0;
+uniform float contrast = 1.0;
+uniform float saturation = 1.0;
+
+void fragment() {
+    vec3 c = textureLod(SCREEN_TEXTURE, SCREEN_UV, 0.0).rgb;
+    
+	if (abs(c.r - 102. / 255.) < 0.1)
+	  COLOR.rgb = vec3(75, 105, 47)/255.;
+	else
+	  COLOR.rgb = vec3(143, 151, 74)/255.;
+   
+}"
+
+[sub_resource type="ShaderMaterial" id=4]
+shader = SubResource( 3 )
+shader_param/brightness = 1.0
+shader_param/contrast = 1.0
+shader_param/saturation = 1.0
+
+[sub_resource type="Shader" id=5]
+code = "shader_type canvas_item;
+
+uniform int index;
+
+vec3 map(int index2) {
+  vec3 arr[18] = vec3[] (
+  // blue
+  vec3(91,110,225),  vec3(95,205,228),  vec3(203,219,252),
+  // red-gold
+  vec3(223,113,38),  vec3(255,182,45),  vec3(251,242,54),
+  // green
+  vec3(106,190,48),  vec3(153,229,80),  vec3(203,219,252),
+  // brown
+  vec3(180,123,80),  vec3(217,160,102), vec3(238,195,154),
+  // grey
+  vec3(132,126,135), vec3(155,173,183), vec3(203,219,252),
+  // pink
+  vec3(217,87,99),   vec3(215,123,186), vec3(238,195,154)
+  ); 
+  return arr[ 3 * index + index2 ] / 255.;
+}
+
+void fragment() {
+  COLOR = texture(TEXTURE, UV);
+  if (COLOR.r == 1.)
+    COLOR.rgb = map(0);
+  else if (COLOR.g == 1.)
+    COLOR.rgb = map(1);
+  else if (COLOR.b == 1.)
+    COLOR.rgb = map(2);
+}
+"
+
+[sub_resource type="ShaderMaterial" id=6]
+shader = SubResource( 5 )
+shader_param/index = null
+
+[sub_resource type="ViewportTexture" id=7]
+viewport_path = NodePath("Viewport2")
+
+[sub_resource type="GDScript" id=8]
+script/source = "extends TextureRect
+
+onready var Renderer = $\"/root/GameOfLife/Viewport2/Renderer\"
+
+var time = 0
+
+func _ready():
+	pass 
+
+# might still jitter a little bit
+func _process(delta):
+	time += 0.02
+	rect_position.x = 342 - 0.5 * rect_min_size.x * rect_scale.x
+	rect_position.y = 300 - 0.5 * rect_min_size.y * rect_scale.y + round(sin(time) * 20.0)
+
+"
+
+[sub_resource type="Shader" id=9]
+code = "shader_type canvas_item;
+render_mode blend_disabled;
+
+void fragment() {
+  COLOR = texture(TEXTURE, SCREEN_UV);
+}
+"
+
+[sub_resource type="ShaderMaterial" id=10]
+shader = SubResource( 9 )
+
+[sub_resource type="Shader" id=11]
+code = "shader_type canvas_item;
+render_mode blend_disabled;
+
+uniform float brightness = 1.0;
+uniform float contrast = 1.0;
+uniform float saturation = 1.0;
+
+void fragment() {
+  vec2 frag = FRAGCOORD.xy;
+  vec3 c = textureLod(SCREEN_TEXTURE, SCREEN_UV, 0.0).rgb;
+  
+  // very sloppy code but doesnt matter too much
+    if (abs(c.r - 102. / 255.) < 0.1)
+      COLOR.rgb = vec3(143, 86, 59)/255.;
+    else
+      COLOR.rgb = vec3(180, 123, 80)/255.;
+  
+  COLOR.a *= step(680. + 2.5 * cos(0.2 * frag.y + 4. * TIME), frag.x);//step(690. + cos(100. * frag.y));
+
+}"
+
+[sub_resource type="ShaderMaterial" id=12]
+shader = SubResource( 11 )
+shader_param/brightness = 1.0
+shader_param/contrast = 1.0
+shader_param/saturation = 1.0
+
+[node name="GUI" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 11 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Background" type="ColorRect" parent="."]
+material = SubResource( 2 )
+margin_right = 1024.0
+margin_bottom = 600.0
+color = Color( 0.247059, 0.247059, 0.454902, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Sword" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BackgroundFilter" type="ColorRect" parent="Sword"]
+material = SubResource( 4 )
+margin_left = 106.0
+margin_top = 64.0
+margin_right = 578.0
+margin_bottom = 536.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Border" type="TextureRect" parent="Sword"]
+material = SubResource( 6 )
+margin_left = 102.0
+margin_top = 60.0
+margin_right = 582.0
+margin_bottom = 540.0
+texture = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Name" type="RichTextLabel" parent="Sword"]
+margin_left = 106.0
+margin_top = 93.0
+margin_right = 578.0
+margin_bottom = 194.0
+rect_clip_content = false
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource( 12 )
+bbcode_enabled = true
+bbcode_text = " [center][wave] Helloooooooo"
+text = "  Helloooooooo"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="FinalDisplay" type="TextureRect" parent="Sword"]
+margin_left = 142.0
+margin_top = 100.0
+margin_right = 242.0
+margin_bottom = 200.0
+rect_scale = Vector2( 4, 4 )
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = SubResource( 7 )
+stretch_mode = 3
+flip_v = true
+script = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Viewport" type="Viewport" parent="."]
+size = Vector2( 100, 100 )
+transparent_bg = true
+render_target_clear_mode = 2
+render_target_update_mode = 0
+
+[node name="Renderer" type="Sprite" parent="Viewport"]
+material = SubResource( 10 )
+scale = Vector2( 2, 2 )
+script = ExtResource( 14 )
+
+[node name="Viewport2" type="Viewport" parent="."]
+size = Vector2( 100, 100 )
+transparent_bg = true
+render_target_clear_mode = 2
+render_target_update_mode = 0
+
+[node name="Renderer" type="Sprite" parent="Viewport2"]
+material = ExtResource( 8 )
+scale = Vector2( 2, 2 )
+script = ExtResource( 15 )
+
+[node name="SettingsBackground" type="ColorRect" parent="."]
+material = SubResource( 12 )
+margin_left = 676.0
+margin_right = 1024.0
+margin_bottom = 600.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Settings" type="GridContainer" parent="."]
+margin_left = 714.0
+margin_top = 29.0
+margin_right = 994.0
+margin_bottom = 570.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource( 12 )
+custom_constants/vseparation = 5
+custom_constants/hseparation = 5
+columns = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Color1" type="Label" parent="Settings"]
+margin_top = 9.0
+margin_right = 162.0
+margin_bottom = 41.0
+text = "color1"
+align = 2
+valign = 1
+
+[node name="Color1Box" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_right = 279.0
+margin_bottom = 50.0
+theme = ExtResource( 12 )
+max_value = 5.0
+align = 1
+
+[node name="Color2" type="Label" parent="Settings"]
+margin_top = 64.0
+margin_right = 162.0
+margin_bottom = 96.0
+text = "color2"
+align = 2
+valign = 1
+
+[node name="Color2Box" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_top = 55.0
+margin_right = 279.0
+margin_bottom = 105.0
+max_value = 18.0
+align = 1
+
+[node name="BladeType" type="Label" parent="Settings"]
+margin_top = 119.0
+margin_right = 162.0
+margin_bottom = 151.0
+text = "blade type"
+align = 2
+valign = 1
+
+[node name="BladeTypeBox" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_top = 110.0
+margin_right = 279.0
+margin_bottom = 160.0
+max_value = 5.0
+align = 1
+
+[node name="BladeWidth" type="Label" parent="Settings"]
+margin_top = 174.0
+margin_right = 162.0
+margin_bottom = 206.0
+text = "blade width"
+align = 2
+valign = 1
+
+[node name="BladeWidthBox" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_top = 165.0
+margin_right = 279.0
+margin_bottom = 215.0
+min_value = 4.0
+step = 2.0
+value = 20.0
+align = 1
+
+[node name="BladeHeight" type="Label" parent="Settings"]
+margin_top = 229.0
+margin_right = 162.0
+margin_bottom = 261.0
+text = "blade height"
+align = 2
+valign = 1
+
+[node name="BladeHeightBox" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_top = 220.0
+margin_right = 279.0
+margin_bottom = 270.0
+min_value = 6.0
+max_value = 76.0
+value = 6.0
+align = 1
+
+[node name="HandleWidth" type="Label" parent="Settings"]
+margin_top = 284.0
+margin_right = 162.0
+margin_bottom = 316.0
+text = "handle width"
+align = 2
+valign = 1
+
+[node name="HandleWidthBox" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_top = 275.0
+margin_right = 279.0
+margin_bottom = 325.0
+min_value = 6.0
+step = 2.0
+value = 6.0
+align = 1
+
+[node name="HandleHeight" type="Label" parent="Settings"]
+margin_top = 339.0
+margin_right = 162.0
+margin_bottom = 371.0
+text = "handle height"
+align = 2
+valign = 1
+
+[node name="HandleHeightBox" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_top = 330.0
+margin_right = 279.0
+margin_bottom = 380.0
+min_value = 24.0
+max_value = 94.0
+value = 24.0
+align = 1
+
+[node name="ShapeSeed" type="Label" parent="Settings"]
+margin_top = 394.0
+margin_right = 162.0
+margin_bottom = 426.0
+text = "shape seed"
+align = 2
+valign = 1
+
+[node name="ShapeSeedBox" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_top = 385.0
+margin_right = 279.0
+margin_bottom = 435.0
+max_value = 999.0
+value = 24.0
+align = 1
+
+[node name="PatternSeed" type="Label" parent="Settings"]
+margin_top = 449.0
+margin_right = 162.0
+margin_bottom = 481.0
+text = "pattern seed"
+align = 2
+valign = 1
+
+[node name="PatternSeedBox" type="SpinBox" parent="Settings"]
+margin_left = 167.0
+margin_top = 440.0
+margin_right = 279.0
+margin_bottom = 490.0
+size_flags_vertical = 0
+max_value = 999.0
+value = 24.0
+align = 1
+
+[node name="RandomButton" type="Button" parent="Settings"]
+margin_left = 20.0
+margin_top = 495.0
+margin_right = 142.0
+margin_bottom = 541.0
+mouse_default_cursor_shape = 2
+size_flags_horizontal = 4
+text = "random"
+align = 2
+
+[node name="ExportButton" type="Button" parent="Settings"]
+margin_left = 167.0
+margin_top = 495.0
+margin_right = 279.0
+margin_bottom = 541.0
+mouse_default_cursor_shape = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "export"
+
+[node name="Right" type="TextureButton" parent="."]
+margin_left = 596.0
+margin_top = 256.0
+margin_right = 604.0
+margin_bottom = 267.0
+rect_scale = Vector2( 8, 8 )
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Left" type="TextureButton" parent="."]
+margin_left = 22.0
+margin_top = 256.0
+margin_right = 30.0
+margin_bottom = 267.0
+rect_scale = Vector2( 8, 8 )
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Sounds" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Right" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 6 )
+
+[node name="Left" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 5 )
+
+[node name="Export" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 1 )
+
+[connection signal="value_changed" from="Settings/Color1Box" to="." method="_on_Color1Box_value_changed"]
+[connection signal="value_changed" from="Settings/Color2Box" to="." method="_on_Color2Box_value_changed"]
+[connection signal="value_changed" from="Settings/BladeTypeBox" to="." method="_on_BladeTypeBox_value_changed"]
+[connection signal="value_changed" from="Settings/BladeWidthBox" to="." method="_on_BladeWidthBox_value_changed"]
+[connection signal="value_changed" from="Settings/BladeHeightBox" to="." method="_on_BladeHeightBox_value_changed"]
+[connection signal="value_changed" from="Settings/HandleWidthBox" to="." method="_on_HandleWidthBox_value_changed"]
+[connection signal="value_changed" from="Settings/HandleHeightBox" to="." method="_on_HandleHeightBox_value_changed"]
+[connection signal="value_changed" from="Settings/ShapeSeedBox" to="." method="_on_SeedBox_value_changed"]
+[connection signal="value_changed" from="Settings/PatternSeedBox" to="." method="_on_SeedBox2_value_changed"]
+[connection signal="pressed" from="Settings/RandomButton" to="." method="_on_RandomButton_pressed"]
+[connection signal="pressed" from="Settings/ExportButton" to="." method="_on_ExportButton_pressed"]
+[connection signal="pressed" from="Right" to="." method="_on_Right_pressed"]
+[connection signal="pressed" from="Left" to="." method="_on_Left_pressed"]

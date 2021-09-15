@@ -1,0 +1,31 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[  ]
+_global_script_class_icons={
+}
+
+[application]
+
+config/name="Sword Maker"
+run/main_scene="res://SwordMaker.tscn"
+config/icon="res://icon.png"
+
+[display]
+
+window/stretch/mode="viewport"
+
+[physics]
+
+common/physics_jitter_fix=0.0
+
+[rendering]
+
+environment/default_clear_color=Color( 0, 0, 0, 0 )
