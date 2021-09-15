@@ -179,10 +179,11 @@ float getMirroredNoise(vec2 mir, vec2 frag) {
   f = 0.5 + 0.5 * f;
 
   float v = 0.5 * (1. - cos(3.14159 * 100. * f));   // *50.
+  //v = (4. * v + 2.) / 6.; // <-- makes it more symmetrical (but less colors on both sides)
   // = 16. * v * v * (1.-v) * (1.-v);
   //v = 4. * v * (1.-v);
   v = min(1., v * (0.6 + 0.9 * frag.y / dimHandle.y));
-  v = (frag.x <= 0.5 * dimHandle.x) ? max(0., v - 2. / 6.) : v;
+  v = (frag.x <= 0.5 * max(dimHandle.x, dimGem.x)) ? max(0., v - 2. / 6.) : v;
   
   return v;
 }
@@ -248,6 +249,7 @@ void fragment() {
   vec2 dim = 1. / sz;
   vec2 frag = FRAGCOORD.xy;
 
+  // should probably remove this
   vec2 centre = 0.5 * vec2(max(dimHandle.x, dimGem.x), dimHandle.y + dimGem.y);
 
   float e = texture(TEXTURE, uv).x;

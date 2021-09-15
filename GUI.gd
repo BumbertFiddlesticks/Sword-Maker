@@ -27,6 +27,7 @@ var rng = RandomNumberGenerator.new()
 func _ready():
 	randomize()
 	set_rand_values()
+	yield(get_tree(), "idle_frame")
 	push_sword_back()
 	reset()
 
