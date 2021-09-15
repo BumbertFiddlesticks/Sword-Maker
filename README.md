@@ -2,7 +2,7 @@
 
 Procedurally generated pixel art swords, coded in Godot.
 
-![alt text](https://github.com/BumbertFiddlesticks/SpriteGenerator/blob/main/Example.png?raw=true)
+![alt text](https://github.com/BumbertFiddlesticks/Sword-Maker/blob/main/screenshot.png?raw=true)
 
 Much inspiration, and code was nabbed from the following:
 
