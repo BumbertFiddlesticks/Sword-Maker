@@ -1,8 +1,15 @@
 // This shader is modified from here:
 // https://www.shadertoy.com/view/slBXWc
 
-// (sorry if it's a bit hard to understand - I can't be bothered to add comments)
+// DANGER: 
+// SPAGHETTI CODE, READ AT YOUR OWN RISK
 
+// IMPORTANT: 
+// color values are offset offline but not in HTML5 version
+// ctrl + f "hacky" and uncomment out the last two "hacky solutions" if you want
+// correct colors for offline version, comment out for online version
+
+// ^^ tried doing this with a uniform bool but that just broke things more...
 
 shader_type canvas_item;
 render_mode blend_disabled;
@@ -317,6 +324,9 @@ void fragment() {
     else 
       COLOR = vec4(0.,0.,0.,0.);
     }
+    
+    // hacky solution: colors are offset for some reason
+    COLOR.rgb += vec3(1. / 255.);
 
     if (frame < 21) {
       COLOR = vec4(e, e, e, 1.);     
@@ -358,5 +368,11 @@ void fragment() {
       COLOR = vec4(lightMap(col.g - 1.), 1.); 
     else if (col.b > 0.)
       COLOR = vec4(darkMap(col.b - 1.), 1.); 
+
+    // hacky solution: colors are offset for some reason
+    if (col.r > 0.) 
+      COLOR.rgb += vec3(1. / 255.);
   }
+  
+  COLOR.a = clamp(COLOR.a, 0., 1.);
 }

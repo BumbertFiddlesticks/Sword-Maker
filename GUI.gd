@@ -24,12 +24,19 @@ var arrayIndex = 0
 
 var rng = RandomNumberGenerator.new()
 
+# bug: using reset can make first sword buggy if you change its bladeWidth (idk why)
 func _ready():
-	randomize()
-	set_rand_values()
+	#if (OS.get_name() == "HTML5"):
+	#	$mat2.set_shader_param("HTML", 1)
 	yield(get_tree(), "idle_frame")
+	yield(get_tree(), "idle_frame")
+	randomize()
+
+	set_rand_values()
+	#yield(get_tree(), "idle_frame")
 	push_sword_back()
-	reset()
+	_on_BladeWidthBox_value_changed(bladeWidth)
+	#reset()
 
 # reset values and re-run the sword shader
 func reset():
@@ -136,9 +143,10 @@ func _on_BladeWidthBox_value_changed(value):
 		bladeWidth = min(bladeWidth, 2 * floor(bladeHeight / 4) + 2)
 	elif (bladeType != 0):
 		bladeWidth = min(bladeWidth, 2 * floor(bladeHeight / 2))
+	else:
+		bladeWidth = min(bladeWidth, 2 * floor(bladeHeight / 2) + 2)
 	
 	array[arrayIndex][4] = bladeWidth
-	
 	reset()
 
 
@@ -149,7 +157,9 @@ func _on_BladeHeightBox_value_changed(value):
 		bladeHeight = max(bladeHeight, 2 * bladeWidth - 6)
 	elif (bladeType != 0):
 		bladeHeight = max(bladeHeight, bladeWidth)
-
+	else:
+		bladeWidth = min(bladeWidth, 2 * floor(bladeHeight / 2) + 2)
+		
 	array[arrayIndex][5] = bladeHeight
 	reset()
 
@@ -203,11 +213,12 @@ func export_image():
 	save_image(tex)
 
 
+#
 func save_image(img):
 	var fileName = str(color1) + "_" + str(color2) + "_" + str(bladeType) + "_" + str(bladeWidth) + "_" + str(bladeHeight) + "_" + str(handleWidth) + "_" + str(handleHeight) + "_" + str(shapeSeed) + "_" + str(patternSeed)
 	if OS.get_name() == "HTML5" and OS.has_feature('JavaScript'):
-		var filesaver = get_tree().root.get_node("/root/HTML5File")
-		filesaver.save_image(img, fileName)
+		#var filesaver = get_tree().root.get_node("/root/HTML5File")
+		$FileSaver.save_image(img, fileName)
 	else:
 		if OS.get_name() == "OSX":
 			img.save_png("user://" + fileName + ".png")

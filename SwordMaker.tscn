@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://GUI/export2.wav" type="AudioStream" id=1]
 [ext_resource path="res://GUI/arrow-hover.png" type="Texture" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://GUI/4r.wav" type="AudioStream" id=6]
 [ext_resource path="res://swordbackground.png" type="Texture" id=7]
 [ext_resource path="res://Sword.tres" type="Material" id=8]
+[ext_resource path="res://addons/HTML5FileExchange/HTML5FileExchange.gd" type="Script" id=9]
 [ext_resource path="res://GUI.gd" type="Script" id=11]
 [ext_resource path="res://GUI/Theme.tres" type="Theme" id=12]
 [ext_resource path="res://Renderer.gd" type="Script" id=14]
@@ -499,6 +500,9 @@ stream = ExtResource( 5 )
 
 [node name="Export" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource( 1 )
+
+[node name="FileSaver" type="Node" parent="."]
+script = ExtResource( 9 )
 
 [connection signal="value_changed" from="Settings/Color1Box" to="." method="_on_Color1Box_value_changed"]
 [connection signal="value_changed" from="Settings/Color2Box" to="." method="_on_Color2Box_value_changed"]
