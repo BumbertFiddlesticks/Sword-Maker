@@ -311,7 +311,7 @@ margin_left = 167.0
 margin_top = 55.0
 margin_right = 279.0
 margin_bottom = 105.0
-max_value = 18.0
+max_value = 17.0
 align = 1
 
 [node name="BladeType" type="Label" parent="Settings"]
