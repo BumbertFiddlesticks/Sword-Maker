@@ -2,6 +2,8 @@
 
 Procedurally generated pixel art swords, coded in Godot.
 
+You can use it online here: https://snoopethduckduck.itch.io/sword-maker
+
 ![alt text](https://github.com/BumbertFiddlesticks/Sword-Maker/blob/main/screenshot.png?raw=true)
 
 Much inspiration, and code was nabbed from the following:
